@@ -12,8 +12,58 @@
 #include <utility>
 #include <random>
 #include <queue>
+#include <fstream>
+#include <string>
+#include <sstream>
 
+void parser::read(const std::string& filename)
+{
+    std::ifstream inputf(filename);
+    if (!inputf)
+    {
+        std::cout << "Can't open file!" << std::endl;
+        return;
+    }
+    std::string line;
+    bool begin = false;
+    while (getline(inputf, line))
+    {
+        std::stringstream ss(line);
+        std::string word;
+        std::vector<std::string> words;
+        while (std::getline(ss, word, ' '))
+        {
+            words.emplace_back(word);
+        }
 
+        if (!words.empty())
+        {
+            if (words.at(0) == "0")
+            {
+                begin = true;
+            }
+            if (begin == true)
+            {
+                edges.emplace_back();
+                for (int i = 1; i < words.size(); i++)
+                {
+                    edges.back().emplace_back(std::stoi(words.at(i)));
+                }
+            }
+        }
+    }
+}
+
+void parser::write()
+{
+    for(int i=0;i<edges.size();i++){
+        std::cout<<i;
+        for(int j=0;j<edges.at(i).size();j++){
+            std::cout<<" "<<edges.at(i).at(j);
+        }
+        std::cout<<std::endl;
+    }
+}
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////// HyperNode////////////////////////////////////
@@ -26,13 +76,13 @@ void HyperNode::addEdge(int edge)
 }
 
 // return all edges of the hypernode
-std::vector<int>& HyperNode::getEdges()
+std::vector<int> &HyperNode::getEdges()
 {
     return edges;
 }
 
 // return all neighbors of the hypernode
-std::vector<int>& HyperNode::getNeighbors()
+std::vector<int> &HyperNode::getNeighbors()
 {
     return neighbors;
 }
@@ -66,7 +116,7 @@ void HyperNode::setNodeSize1(double n)
 /////////////////////////////////////////////////////////////////////
 
 // get all nodes in the hyperedge
-std::vector<int>& HyperEdge::getNodes()
+std::vector<int> &HyperEdge::getNodes()
 {
     return nodes;
 }
@@ -84,41 +134,41 @@ double HyperEdge::getEdgeWeight()
 // which are connected to the new edge
 void Hypergraph::addNodeList(int edge_id, std::vector<int> &vtxs)
 {
-    for (int i=0; i<vtxs.size(); i++)
+    for (int i = 0; i < vtxs.size(); i++)
     {
         nodes[vtxs[i]]->addEdge(edge_id);
     }
 
-    HyperEdge* newEdge = new HyperEdge(vtxs, 1.0/(static_cast<double>(vtxs.size())-1.0));
+    HyperEdge *newEdge = new HyperEdge(vtxs, 1.0 / (static_cast<double>(vtxs.size()) - 1.0));
     edges.emplace_back(newEdge);
 }
 
 // add a hypernode to the hypergraph and increase partition size
-void Hypergraph::addNode(HyperNode* n)
+void Hypergraph::addNode(HyperNode *n)
 {
     nodes.emplace_back(n);
 }
 
 // return all hyperedges in the current graph
-std::vector<HyperEdge*>& Hypergraph::getAllEdges()
+std::vector<HyperEdge *> &Hypergraph::getAllEdges()
 {
     return edges;
 }
 
 // return all hypernodes in the current graph
-std::vector<HyperNode*>& Hypergraph::getAllNodes()
+std::vector<HyperNode *> &Hypergraph::getAllNodes()
 {
     return nodes;
 }
 
 // return connected edges of node n
-std::vector<int>& Hypergraph::getEdgesOf(int n)
+std::vector<int> &Hypergraph::getEdgesOf(int n)
 {
     return nodes[n]->getEdges();
 }
 
 // return connected nodes of edge e
-std::vector<int>& Hypergraph::getNodesOf(int e)
+std::vector<int> &Hypergraph::getNodesOf(int e)
 {
     return edges[e]->getNodes();
 }
@@ -150,7 +200,7 @@ double Hypergraph::getEdgeWeightOf(int e)
 }
 
 // return neighbors of the given node index
-std::vector<int>& Hypergraph::getNeighborsOf(int n)
+std::vector<int> &Hypergraph::getNeighborsOf(int n)
 {
     return nodes[n]->getNeighbors();
 }
@@ -161,35 +211,36 @@ double Hypergraph::getTerminalSize()
     return terminalSize;
 }
 
-std::pair<int, std::vector<int>*> Hypergraph::coarseNodes(std::vector<int>* nds)
+std::pair<int, std::vector<int> *> Hypergraph::coarseNodes(std::vector<int> *nds)
 {
     int minIdx = *std::min_element(nds->begin(), nds->end());
-    double size0 = 0, size1 =0;
+    double size0 = 0, size1 = 0;
 
-    for (auto it=nds->begin(); it!=nds->end(); it++)
+    for (auto it = nds->begin(); it != nds->end(); it++)
     {
         size0 += getNodeSizeOf(*it, 0);
         size1 += getNodeSizeOf(*it, 1);
 
-        if (*it == minIdx) continue;
+        if (*it == minIdx)
+            continue;
         setNodeExistOf(*it, false);
 
-        std::vector<int>& edges_ = getEdgesOf(*it);
-        for (auto itt=edges_.begin(); itt!=edges_.end(); itt++)
+        std::vector<int> &edges_ = getEdgesOf(*it);
+        for (auto itt = edges_.begin(); itt != edges_.end(); itt++)
         {
-            std::vector<int>& nodes_ = getNodesOf(*itt);
+            std::vector<int> &nodes_ = getNodesOf(*itt);
             int c = getNodeNumOf(*itt);
 
-            auto end = nodes_.begin()+c;
+            auto end = nodes_.begin() + c;
             auto n_idx = std::find(nodes_.begin(), end, *it);
-            std::iter_swap(n_idx, end-1);
+            std::iter_swap(n_idx, end - 1);
 
             if (std::find(nodes_.begin(), end, minIdx) != end)
-                setNodeNumOf(*itt, c-1);    // delete
+                setNodeNumOf(*itt, c - 1); // delete
             else
             {
                 // relink
-                nodes_[c-1] = minIdx;
+                nodes_[c - 1] = minIdx;
                 nodes[minIdx]->addEdge(*itt);
             }
         }
@@ -246,7 +297,7 @@ void Hypergraph::setNodeNum(int num)
     nodeNum = num;
 }
 
- // set node size on layer 0
+// set node size on layer 0
 void Hypergraph::setNodeSizeOf(int idx, double size, int layer)
 {
     if (layer == 0)
@@ -264,19 +315,20 @@ void Hypergraph::setTerminalSize(double size)
 // build and merge neighbors of all nodes after coarsening
 void Hypergraph::buildNeighbors()
 {
-    for (int i=0; i<nodes.size(); i++)
+    for (int i = 0; i < nodes.size(); i++)
     {
-        if (!getNodeExistOf(i)) continue;
+        if (!getNodeExistOf(i))
+            continue;
 
-        std::vector<int>& edges_ = getEdgesOf(i);
-        std::vector<int>& neigs = getNeighborsOf(i);
+        std::vector<int> &edges_ = getEdgesOf(i);
+        std::vector<int> &neigs = getNeighborsOf(i);
         neigs.clear();
-        
-        for (int j=0; j<edges_.size(); j++)
+
+        for (int j = 0; j < edges_.size(); j++)
         {
-            std::vector<int>& nds = getNodesOf(edges_[j]);
+            std::vector<int> &nds = getNodesOf(edges_[j]);
             int count = getNodeNumOf(edges_[j]);
-            neigs.insert(neigs.end(), nds.begin(), nds.begin()+count);
+            neigs.insert(neigs.end(), nds.begin(), nds.begin() + count);
         }
 
         sort(neigs.begin(), neigs.end());
@@ -284,44 +336,46 @@ void Hypergraph::buildNeighbors()
     }
 }
 
-void Hypergraph::revertGraph(std::vector<std::pair<int, std::vector<int>*>>* coarsenInfo)
+void Hypergraph::revertGraph(std::vector<std::pair<int, std::vector<int> *>> *coarsenInfo)
 {
-    for (auto it=coarsenInfo->rbegin(); it!=coarsenInfo->rend(); it++)
+    for (auto it = coarsenInfo->rbegin(); it != coarsenInfo->rend(); it++)
     {
         int base = it->first;
         double size0 = getNodeSizeOf(base, 0), size1 = getNodeSizeOf(base, 1);
         std::vector<bool> edgeConnected(edges.size(), false);
-        std::vector<int>& eds = getEdgesOf(base);
-        std::vector<int>* nds = it->second;
+        std::vector<int> &eds = getEdgesOf(base);
+        std::vector<int> *nds = it->second;
 
-        for (auto itt=eds.begin(); itt!=eds.end(); itt++)
+        for (auto itt = eds.begin(); itt != eds.end(); itt++)
             edgeConnected[*itt] = true;
 
-        for (auto itt=nds->rbegin(); itt!=nds->rend(); itt++)
+        for (auto itt = nds->rbegin(); itt != nds->rend(); itt++)
         {
-            if (*itt == base) continue;
+            if (*itt == base)
+                continue;
             nodeExist[*itt] = true;
 
-            std::vector<int>& eds_ = getEdgesOf(*itt);           
-            for (auto itt_=eds_.rbegin(); itt_!=eds_.rend(); itt_++)
+            std::vector<int> &eds_ = getEdgesOf(*itt);
+            for (auto itt_ = eds_.rbegin(); itt_ != eds_.rend(); itt_++)
             {
                 if (edgeConnected[*itt_])
                 {
-                    std::vector<int>& nds_ = getNodesOf(*itt_);
+                    std::vector<int> &nds_ = getNodesOf(*itt_);
                     int count = getNodeNumOf(*itt_);
 
                     if (count < nds_.size() && nds_[count] == *itt)
                     {
-                        setNodeNumOf(*itt_, count+1);
+                        setNodeNumOf(*itt_, count + 1);
                     }
                     else
                     {
-                        auto idx = std::find(nds_.begin(), nds_.begin()+count, base);
+                        auto idx = std::find(nds_.begin(), nds_.begin() + count, base);
                         *idx = *itt;
                         eds.pop_back();
                     }
 
-                    if (!edgeExist[*itt_]) edgeExist[*itt_] = true;
+                    if (!edgeExist[*itt_])
+                        edgeExist[*itt_] = true;
                 }
             }
 
@@ -336,12 +390,13 @@ void Hypergraph::revertGraph(std::vector<std::pair<int, std::vector<int>*>>* coa
 }
 
 // check if the size of the given node vector is under space limit
-bool Hypergraph::sizeUnderLimit(std::vector<int>& nodesConnected, int count, int part, double totalSize)
+bool Hypergraph::sizeUnderLimit(std::vector<int> &nodesConnected, int count, int part, double totalSize)
 {
-    for (auto it=nodesConnected.begin(); it!=nodesConnected.begin()+count; it++)
+    for (auto it = nodesConnected.begin(); it != nodesConnected.begin() + count; it++)
     {
         totalSize -= getNodeSizeOf(*it, part);
-        if (totalSize < 0) return false;
+        if (totalSize < 0)
+            return false;
     }
 
     return true;
@@ -350,20 +405,18 @@ bool Hypergraph::sizeUnderLimit(std::vector<int>& nodesConnected, int count, int
 // display current graph in hmetis format
 void Hypergraph::displayGraph()
 {
-    std::vector<HyperEdge*> &edges = getAllEdges();
+    std::vector<HyperEdge *> &edges = getAllEdges();
 
-    for (int i=0; i<edges.size(); i++)
+    for (int i = 0; i < edges.size(); i++)
     {
         std::vector<int> &vtxs = edges[i]->getNodes();
-        for (int j=0; j<vtxs.size(); j++)
+        for (int j = 0; j < vtxs.size(); j++)
         {
             std::cout << vtxs[j] << ", ";
         }
         std::cout << std::endl;
     }
 }
-
-
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////// layerInfo ///////////////////////////////////
@@ -419,19 +472,20 @@ void LayerInfo::setTotalTerminalSize(double size)
     totalTerminalSize = size;
 }
 
-void LayerInfo::computeTotalTerminalSize(Hypergraph* g)
+void LayerInfo::computeTotalTerminalSize(Hypergraph *g)
 {
     double score = 0, terminalSize = g->getTerminalSize();
 
-    for (int i=0; i<g->getEdgeNum(); i++)
+    for (int i = 0; i < g->getEdgeNum(); i++)
     {
-        if (!g->getEdgeExistOf(i)) continue;
+        if (!g->getEdgeExistOf(i))
+            continue;
 
         std::vector<int> &nds = g->getNodesOf(i);
         int count = g->getNodeNumOf(i);
         int part = getPartitionOf(nds[0]);
 
-        for (auto it=nds.begin(); it!=nds.begin()+count; it++)
+        for (auto it = nds.begin(); it != nds.begin() + count; it++)
         {
             if (getPartitionOf(*it) != part)
             {
@@ -445,19 +499,20 @@ void LayerInfo::computeTotalTerminalSize(Hypergraph* g)
 }
 
 // count and set hypergraph partition score
-void LayerInfo::computePartitionScore(Hypergraph* g)
+void LayerInfo::computePartitionScore(Hypergraph *g)
 {
     double score = DBL_MIN;
 
-    for (int e_id=0; e_id<g->getEdgeNum(); e_id++)
+    for (int e_id = 0; e_id < g->getEdgeNum(); e_id++)
     {
-        if (!g->getEdgeExistOf(e_id)) continue;
+        if (!g->getEdgeExistOf(e_id))
+            continue;
 
         std::vector<int> &nds = g->getNodesOf(e_id);
         int count = g->getNodeNumOf(e_id);
         int part = getPartitionOf(nds[0]);
 
-        for (auto it=nds.begin(); it!=nds.begin()+count; it++)
+        for (auto it = nds.begin(); it != nds.begin() + count; it++)
         {
             if (getPartitionOf(*it) != part)
             {
@@ -470,19 +525,19 @@ void LayerInfo::computePartitionScore(Hypergraph* g)
     setPartitionScore(score);
 }
 
-void LayerInfo::mapPartition(std::vector<std::pair<int, std::vector<int>*>>* coarsenInfo)
+void LayerInfo::mapPartition(std::vector<std::pair<int, std::vector<int> *>> *coarsenInfo)
 {
-    for (auto it=coarsenInfo->begin(); it!=coarsenInfo->end(); it++)
+    for (auto it = coarsenInfo->begin(); it != coarsenInfo->end(); it++)
     {
         auto nds = it->second;
         int part = getPartitionOf(it->first);
 
-        for (auto itt=nds->begin(); itt!=nds->end(); itt++)
+        for (auto itt = nds->begin(); itt != nds->end(); itt++)
             setPartitionOf(*itt, part);
     }
 }
 
-bool LayerInfo::bfsPlacing(Hypergraph* graph, std::vector<double>& spaceLimit)
+bool LayerInfo::bfsPlacing(Hypergraph *graph, std::vector<double> &spaceLimit)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -495,21 +550,22 @@ bool LayerInfo::bfsPlacing(Hypergraph* graph, std::vector<double>& spaceLimit)
         std::vector<bool> nodesPicked(graph->getAllNodes().size(), false);
         std::queue<int> q;
         double p0size = 0, p1size = getp1size();
-        int firstNode = gen()%hnodeSize;
+        int firstNode = gen() % hnodeSize;
 
-        while(!graph->getNodeExistOf(firstNode)) 
+        while (!graph->getNodeExistOf(firstNode))
         {
             firstNode++;
-            if (firstNode == hnodeSize) firstNode = 0;
+            if (firstNode == hnodeSize)
+                firstNode = 0;
         }
         q.push(firstNode);
         nodesPicked[firstNode] = true;
 
-        while (p1size > spaceLimit[1]/2)
+        while (p1size > spaceLimit[1] / 2)
         {
             // make sure there always exists node in BFS queue
             int top;
-            if (!q.empty()) 
+            if (!q.empty())
             {
                 top = q.front();
                 q.pop();
@@ -517,23 +573,25 @@ bool LayerInfo::bfsPlacing(Hypergraph* graph, std::vector<double>& spaceLimit)
             else
             {
                 int count = 0;
-                top = gen()%hnodeSize;
+                top = gen() % hnodeSize;
                 for (; count < hnodeSize; count++)
                 {
-                    if (!nodesPicked[top] && graph->getNodeExistOf(top)) break;
-                    top = (top+1)%hnodeSize;
+                    if (!nodesPicked[top] && graph->getNodeExistOf(top))
+                        break;
+                    top = (top + 1) % hnodeSize;
                 }
-                if (count == hnodeSize) break;
+                if (count == hnodeSize)
+                    break;
                 nodesPicked[top] = true;
             }
 
             // BFS
-            std::vector<int>& edges = graph->getEdgesOf(top);
-            for (auto it = edges.begin(); it != edges.end(); it++) 
+            std::vector<int> &edges = graph->getEdgesOf(top);
+            for (auto it = edges.begin(); it != edges.end(); it++)
             {
-                std::vector<int>& nodes = graph->getNodesOf(*it);
+                std::vector<int> &nodes = graph->getNodesOf(*it);
                 int c = graph->getNodeNumOf(*it);
-                for (auto itt = nodes.begin(); itt != nodes.begin()+c; itt++)
+                for (auto itt = nodes.begin(); itt != nodes.begin() + c; itt++)
                 {
                     if (!nodesPicked[*itt] && getPartitionOf(*itt) == 1)
                     {
@@ -545,9 +603,10 @@ bool LayerInfo::bfsPlacing(Hypergraph* graph, std::vector<double>& spaceLimit)
 
             // check if the shift fit the spacing limitations
             double size0 = graph->getNodeSizeOf(top, 0), size1 = graph->getNodeSizeOf(top, 1);
-            if (!(p0size+size0 > spaceLimit[0]))
+            if (!(p0size + size0 > spaceLimit[0]))
             {
-                p0size += size0; p1size -= size1;
+                p0size += size0;
+                p1size -= size1;
                 setPartitionOf(top, 0);
             }
         }

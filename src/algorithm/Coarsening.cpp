@@ -1,10 +1,10 @@
+#include "Coarsening.hpp"
 
-
-std::vector<std::pair<int, std::vector<int>*>>* Coarsen::Coarsening(Hypergraph* graph, 
-                                                                    LayerInfo* inst, 
-                                                                    std::vector<double>& spaceLimit, 
-                                                                    bool restricted, 
-                                                                    std::string& scheme)
+std::vector<std::pair<int, std::vector<int> *>> *Coarsen::Coarsening(Hypergraph *graph,
+                                                                     LayerInfo *inst,
+                                                                     std::vector<double> &spaceLimit,
+                                                                     bool restricted,
+                                                                     std::string &scheme)
 {
     if (scheme == "HEC")
         return HEC.Coarsening(graph, inst, spaceLimit, restricted, false);

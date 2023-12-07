@@ -2,9 +2,9 @@
 
 #include "Hypergraph.hpp"
 #include "../algorithm/partition.hpp"
+#include "../algorithm/Coarsening.hpp"
 
 
-//#include "../parsing.hpp"
 
 #include <string>
 #include <stack>
@@ -14,69 +14,69 @@
 
 class Hmetis
 {
-    private:
-        Hypergraph* graph;
-        std::list<LayerInfo*> Instances;
-        std::vector<double> spaceLimit;
-        std::vector<std::vector<std::pair<int, std::vector<int>*>>*> coarsenInfo;
+private:
+    Hypergraph *graph;
+    std::list<LayerInfo *> Instances;
+    std::vector<double> spaceLimit;
+    std::vector<std::vector<std::pair<int, std::vector<int> *>> *> coarsenInfo;
 
-    public:
-        Hmetis() = default;
+public:
+    Hmetis() = default;
 
-        // int uncoarCnt = 0;
-        // multiset<pair<double, pair<int, int>>> sizeOrder;
+    // int uncoarCnt = 0;
+    // multiset<pair<double, pair<int, int>>> sizeOrder;
 
-        // build graph by the given box
-        void configureGraph(BOX &box);
+    // build graph by the given box
+    // void configureGraph(BOX &box);
 
-        // output partitioned graph to the given box
-        void outputGraph(BOX &box);
-        
-        // hmetis coarsening
-        // bool for if the coarsening is "restricted"
-        void coarsen(int, bool, std::string, int);
+    // // output partitioned graph to the given box
+    // void outputGraph(BOX &box);
 
-        // hmetis initial partitioning
-        // int for the number of Instances desired
-        // void initialPartition(int, Hypergraph&);
-        void initialPartition(int, std::string);
+    // hmetis coarsening
+    // bool for if the coarsening is "restricted"
+    void coarsen(int, bool, std::string, int);
 
-        // hmetis uncoarsening
-        // double stands for 'dropRate'
-        void uncoarsen(double, std::string);
+    // hmetis initial partitioning
+    // int for the number of Instances desired
+    // void initialPartition(int, Hypergraph&);
+    void initialPartition(int, std::string);
 
-        // new_partition uncoarsening
-        void newUncoarsen();
+    // hmetis uncoarsening
+    // double stands for 'dropRate'
+    void uncoarsen(double, std::string);
 
-        // hmetis refine
-        void refine(int, double, std::string, std::string, int);
+    // new_partition uncoarsening
+    void newUncoarsen();
 
-        // return the size of instances[]
-        int getInstanceSize();
+    // hmetis refine
+    void refine(int, double, std::string, std::string, int);
 
-        // drop instances which are 'dropRate' worse than the best cut (0.1 stands for 10 percent)
-        void dropWorstCut(double);
+    // return the size of instances[]
+    int getInstanceSize();
 
-        void chooseBestInstance();
+    // drop instances which are 'dropRate' worse than the best cut (0.1 stands for 10 percent)
+    void dropWorstCut(double);
 
-        // return sorted node idx in non-decreasing node size order
-        std::vector<int> sortNode(Hypergraph*);
+    void chooseBestInstance();
 
-        // reduce total terminal size to fit the limit in initial partition
-        void enableTerminalSizeLimit(Hypergraph*, std::vector<int>&);
+    // return sorted node idx in non-decreasing node size order
+    std::vector<int> sortNode(Hypergraph *);
 
-        void preIPAdjustment();
+    // reduce total terminal size to fit the limit in initial partition
+    void enableTerminalSizeLimit(Hypergraph *, std::vector<int> &);
+
+    void preIPAdjustment();
 };
 
 struct partition_info
 {
-    Hypergraph* graph;
-    LayerInfo* inst;
+    Hypergraph *graph;
+    LayerInfo *inst;
     std::vector<double> spaceLimit;
     std::string scheme;
 
-    partition_info(Hypergraph* graph,
-                    LayerInfo* inst,
-                    std::vector<double> spaceLimit,
-                    std::string scheme): graph(graph), inst(inst), spaceLimit(spaceLimit), scheme(scheme) {}
+    partition_info(Hypergraph *graph,
+                   LayerInfo *inst,
+                   std::vector<double> spaceLimit,
+                   std::string scheme) : graph(graph), inst(inst), spaceLimit(spaceLimit), scheme(scheme) {}
 };
