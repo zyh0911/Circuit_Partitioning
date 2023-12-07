@@ -11,10 +11,8 @@
 int main(int argc, char *argv[]) {
   if (argc == 1) {
     std::string filename1 =
-        "/home/oem/Documents/LVS_comparer/test/jpeg/jpeg_verilog5.sp"; // layoput
-    std::string filename2 =
-        "/home/oem/Documents/LVS_comparer/test/jpeg/jpeg_verilog.sp"; // source
-    Database db(filename1, filename2);
+        "/home/oem/Documents/LVS_comparer/test/jpeg/jpeg_verilog5.sp";
+    Database db(filename1);
     compare_gpu(db);
   } else if (argc > 2) {
     Database db(argv[1], argv[2]);

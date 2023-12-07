@@ -1,11 +1,13 @@
-set(PROJECT_NAME graph_part)
-project(${PROJECT_NAME} LANGUAGES CXX CUDA)
+cmake_minimum_required(VERSION 3.20.0)
+
+project(Circuit_Partitioning VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-cmake_minimum_required(VERSION 3.14)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+    message("Setting default build type to Release")
+endif()
 
 add_subdirectory(src)
-
-
