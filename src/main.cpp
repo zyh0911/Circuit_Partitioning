@@ -1,4 +1,5 @@
 #include "database/database.hpp"
+#include "database/info.hpp"
 
 #include <iostream>
 #include <map>

@@ -1,4 +1,4 @@
-add_library(libcomp Coarsening.cpp EC_Coarsening.cpp HEC_Coarsening.cpp)
+add_library(libcomp Coarsening.cpp partition.cpp)
 target_include_directories(libcomp PRIVATE ${CMAKE_SOURCE_DIR})
 target_compile_options(libdb PRIVATE
   $<$<CXX_COMPILER_ID:MSVC>:/W4>
