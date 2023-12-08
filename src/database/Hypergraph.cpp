@@ -253,7 +253,7 @@ bool Hypergraph::sizeUnderLimit(std::vector<int> &nodesConnected, int count,
   return true;
 }
 
-// display current graph in hmetis format
+// display current graph in database format
 void Hypergraph::displayGraph() {
   std::vector<HyperEdge *> &edges = getAllEdges();
 
@@ -265,4 +265,3 @@ void Hypergraph::displayGraph() {
     std::cout << std::endl;
   }
 }
-

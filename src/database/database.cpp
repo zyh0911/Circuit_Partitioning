@@ -10,7 +10,7 @@
 #include <thread>
 #include <vector>
 
-void Hmetis::configureGraph(parser &the_parser) {
+void database::configureGraph(parser &the_parser) {
   graph = new Hypergraph(the_parser.nodes.size(), the_parser.edges.size());
   // std::cout << "1111" << std::endl;
   //  std::cout << the_parser.nodes.size() << " " << the_parser.edges.size() <<
@@ -35,7 +35,7 @@ void Hmetis::configureGraph(parser &the_parser) {
 }
 
 // output partitioned graph to the given box
-void Hmetis::outputGraph() {
+void database::outputGraph() {
   result *inst = Instances.front();
 
   for (int i = 0; i < graph->getNodeNum(); i++) {
@@ -45,12 +45,12 @@ void Hmetis::outputGraph() {
   delete inst;
 }
 
-// hmetis coarsening
+// database coarsening
 // 'num' is the number of nodes left after coarsening
 // 'restricted' for if the coarsen is restricted
 // 'maxIter' for maximum coarsening iteration
-void Hmetis::coarsen(int num, bool restricted, std::string scheme,
-                     int maxIter) {
+void database::coarsen(int num, bool restricted, std::string scheme,
+                       int maxIter) {
   Coarsen C;
   result *base;
   int prevNodeNum = INT_MAX, tmpNodeNum;
@@ -75,7 +75,7 @@ void Hmetis::coarsen(int num, bool restricted, std::string scheme,
 }
 
 // check if the coarsening pattern can be placed under constraint
-void Hmetis::preIPAdjustment() {
+void database::preIPAdjustment() {
   result *inst = new result(graph);
 
   while (!inst->bfsPlacing(graph, spaceLimit)) {
@@ -104,9 +104,9 @@ void IPwrapper(partition_info info) {
   biPart(info.graph, info.inst, info.spaceLimit, info.scheme);
 }
 
-// hmetis initial partitioning
+// database initial partitioning
 // 'num' is the number of instances
-void Hmetis::initialPartition(int num, std::string scheme) {
+void database::initialPartition(int num, std::string scheme) {
   // make sure the hypergraph can be partitioned under space limit
   preIPAdjustment();
   std::cout << "1111" << std::endl;
@@ -133,8 +133,8 @@ void biPartWrapper(partition_info info) {
   biPart(info.graph, info.inst, info.spaceLimit, info.scheme);
 }
 
-// hmetis uncoarsening
-void Hmetis::uncoarsen(double dropRate, string scheme) {
+// database uncoarsening
+void database::uncoarsen(double dropRate, string scheme) {
   while (!coarsenInfo.empty()) {
     auto cf = coarsenInfo.back();
     coarsenInfo.pop_back();
@@ -167,20 +167,20 @@ void Hmetis::uncoarsen(double dropRate, string scheme) {
   chooseBestInstance();
 }
 
-// hmetis refine
-void Hmetis::refine(int num, double dropRate, std::string scheme_c,
-                    std::string scheme_u, int maxIter) {
+// database refine
+void database::refine(int num, double dropRate, std::string scheme_c,
+                      std::string scheme_u, int maxIter) {
   coarsen(num, true, scheme_c, maxIter);
 
   uncoarsen(dropRate, scheme_u);
 }
 
 // return the size of instances[]
-int Hmetis::getInstanceSize() { return Instances.size(); }
+int database::getInstanceSize() { return Instances.size(); }
 
 // drop instances which are 'dropRate' worse than the best cut (0.1 stands for
 // 10 percent)
-void Hmetis::dropWorstCut(double dropRate) {
+void database::dropWorstCut(double dropRate) {
   double minScore = DBL_MAX;
 
   for (auto it = Instances.begin(); it != Instances.end(); it++)
@@ -198,7 +198,7 @@ void Hmetis::dropWorstCut(double dropRate) {
 }
 
 // return the best instance in instances[]
-void Hmetis::chooseBestInstance() {
+void database::chooseBestInstance() {
   auto bestIdx = Instances.begin();
   double tmpScore, bestScore = (*bestIdx)->getPartitionScore();
 

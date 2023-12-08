@@ -164,7 +164,6 @@ public:
   // calculate and set terminal size sum
   void countTotalTerminalSize();
 
-  // display current graph in hmetis format
+  // display current graph in database format
   void displayGraph();
 };
-

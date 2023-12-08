@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-class Hmetis {
+class database {
 private:
   Hypergraph *graph;
   std::list<result *> Instances;
@@ -19,7 +19,7 @@ private:
   std::vector<std::vector<std::pair<int, std::vector<int> *>> *> coarsenInfo;
 
 public:
-  Hmetis() = default;
+  database() = default;
 
   // int uncoarCnt = 0;
   // multiset<pair<double, pair<int, int>>> sizeOrder;
@@ -30,23 +30,23 @@ public:
   // output partitioned graph to the given box
   void outputGraph();
 
-  // hmetis coarsening
+  // database coarsening
   // bool for if the coarsening is "restricted"
   void coarsen(int, bool, std::string, int);
 
-  // hmetis initial partitioning
+  // database initial partitioning
   // int for the number of Instances desired
   // void initialPartition(int, Hypergraph&);
   void initialPartition(int, std::string);
 
-  // hmetis uncoarsening
+  // database uncoarsening
   // double stands for 'dropRate'
   void uncoarsen(double, std::string);
 
   // new_partition uncoarsening
   void newUncoarsen();
 
-  // hmetis refine
+  // database refine
   void refine(int, double, std::string, std::string, int);
 
   // return the size of instances[]
