@@ -29,19 +29,25 @@ void database::configureGraph(parser &the_parser) {
     graph->setNodeSizeOf(i - 1, 1, 0);
     graph->setNodeSizeOf(i - 1, 1, 1);
   }
-  spaceLimit.push_back(0.01);
-  spaceLimit.push_back(0.01);
+  spaceLimit.push_back(the_parser.nodes.size() / 2);
+  spaceLimit.push_back(the_parser.nodes.size() / 2);
   graph->setTerminalSize(0);
 }
 
 // output partitioned graph to the given box
 void database::outputGraph() {
   result *inst = Instances.front();
-
+  int num0 = 0;
+  int num1 = 0;
   for (int i = 0; i < graph->getNodeNum(); i++) {
     std::cout << i << " " << inst->getPartitionOf(i) << std::endl;
+    if (inst->getPartitionOf(i) == 0) {
+      num0++;
+    } else {
+      num1++;
+    }
   }
-
+  std::cout << num0 << " " << num1 << std::endl;
   delete inst;
 }
 
@@ -109,7 +115,6 @@ void IPwrapper(partition_info info) {
 void database::initialPartition(int num, std::string scheme) {
   // make sure the hypergraph can be partitioned under space limit
   preIPAdjustment();
-  std::cout << "1111" << std::endl;
   // graph->buildNeighbors();
 
   std::vector<partition_info> infos;
@@ -117,12 +122,11 @@ void database::initialPartition(int num, std::string scheme) {
     result *inst = new result(graph);
     infos.push_back(partition_info(graph, inst, spaceLimit, scheme));
   }
-  std::cout << "1111" << std::endl;
+
   std::vector<std::thread> threads;
   for (int i = 0; i < num; i++) {
     threads.push_back(std::thread(IPwrapper, infos[i]));
   }
-  std::cout << "1111" << std::endl;
   for (int i = 0; i < num; i++) {
     threads[i].join();
     Instances.push_back(infos[i].inst);
