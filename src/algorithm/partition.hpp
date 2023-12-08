@@ -8,7 +8,7 @@
 #include <math.h>
 using namespace std;
 
-int computeGain(Hypergraph *graph, LayerInfo *inst, int nodeIdx)
+inline int computeGain(Hypergraph *graph, LayerInfo *inst, int nodeIdx)
 {
     std::vector<int> &edges = graph->getEdgesOf(nodeIdx);
     int part = inst->getPartitionOf(nodeIdx), gain = 0;
@@ -37,7 +37,7 @@ int computeGain(Hypergraph *graph, LayerInfo *inst, int nodeIdx)
     return gain;
 }
 
-void enableTerminalSize(Hypergraph *graph, LayerInfo *inst, std::vector<double> &spaceLimit)
+inline void enableTerminalSize(Hypergraph *graph, LayerInfo *inst, std::vector<double> &spaceLimit)
 {
     // reduce total terminal size
     double totalTerminalSize = inst->getTotalTerminalSize(), terminalSize = graph->getTerminalSize();
@@ -79,9 +79,9 @@ void enableTerminalSize(Hypergraph *graph, LayerInfo *inst, std::vector<double> 
     inst->setTotalTerminalSize(totalTerminalSize);
 }
 
-int myrandom(int i) { return std::rand() % i; }
+inline int myrandom(int i) { return std::rand() % i; }
 
-void HER(Hypergraph *graph, LayerInfo *inst, vector<double> &spaceLimit)
+inline void HER(Hypergraph *graph, LayerInfo *inst, vector<double> &spaceLimit)
 {
     double terminalSize = graph->getTerminalSize(), totalTerminalSize = inst->getTotalTerminalSize();
     double p1size = inst->getp0size(), p2size = inst->getp1size();
@@ -270,7 +270,7 @@ public:
 };
 
 // move node in gain bucket data structure
-void FM::updateGain(int idx, int delta)
+inline void FM::updateGain(int idx, int delta)
 {
     int gain = nodePointers[idx].first, bucketIdx = maxGain + gain;
 
@@ -280,7 +280,7 @@ void FM::updateGain(int idx, int delta)
     nodePointers[idx].second = --gainBucket[bucketIdx + delta].end();
 }
 
-void FM::getEdgePartitionStatus()
+inline void FM::getEdgePartitionStatus()
 {
     for (int i = 0; i < graph->getAllEdges().size(); i++)
     {
@@ -300,7 +300,7 @@ void FM::getEdgePartitionStatus()
     }
 }
 
-int FM::getMaxGain()
+inline int FM::getMaxGain()
 {
     int maxGain = 0;
 
@@ -317,7 +317,7 @@ int FM::getMaxGain()
     return maxGain;
 }
 
-void FM::buildGainBucketDS()
+inline void FM::buildGainBucketDS()
 {
     for (int i = 0; i < graph->getAllNodes().size(); i++)
     {
@@ -343,7 +343,7 @@ void FM::buildGainBucketDS()
     }
 }
 
-void FM::revertMoves()
+inline void FM::revertMoves()
 {
     for (auto it = revertBuf.rbegin(); it != revertBuf.rend(); it++)
     {
@@ -351,7 +351,7 @@ void FM::revertMoves()
     }
 }
 
-void FM::updateDataStructure(int n_idx)
+inline void FM::updateDataStructure(int n_idx)
 {
     vector<int> &eds = graph->getEdgesOf(n_idx);
     int part = inst->getPartitionOf(n_idx), partTo = part == 0 ? 1 : 0;
@@ -468,7 +468,7 @@ void FM::updateDataStructure(int n_idx)
     inst->setPartitionOf(n_idx, partTo);
 }
 
-int FM::selectVictimNode()
+inline int FM::selectVictimNode()
 {
     int n_idx = -1;
 
@@ -522,7 +522,7 @@ int FM::selectVictimNode()
     return n_idx;
 }
 
-void FM::reset()
+inline void FM::reset()
 {
     revertBuf.clear();
     tmpMaxGain = maxGain;
@@ -533,7 +533,7 @@ void FM::reset()
         locked[i] = false;
 }
 
-void FM::Partition()
+inline void FM::Partition()
 {
     // calculate number of nodes in each edge in each partition
     getEdgePartitionStatus();
@@ -573,7 +573,7 @@ void FM::Partition()
     inst->computePartitionScore(graph);
 }
 
-void biPart(Hypergraph *graph, LayerInfo *inst, vector<double> &spaceLimit, string &scheme)
+inline void biPart(Hypergraph *graph, LayerInfo *inst, vector<double> &spaceLimit, string &scheme)
 {
     if (scheme == "FM")
     {

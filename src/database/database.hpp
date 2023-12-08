@@ -11,6 +11,19 @@
 #include <vector>
 #include <string>
 #include <list>
+class Config {
+public:
+    int numNodeLeft = 20;   // number of node left in the last layer of coarsening
+    int numInstances = 20;  // number of initial partition done in "initial partition" phase
+    double dropRate = 0.3;    // drop partition this rate worse than the best partition in each uncoarsening layer
+    int maxCoarsenIter = 30;   // maximum number of coarening layer (stop coarsening even if the number of node left is larger than "numNodeLeft")
+    int maxRefineIter = 30;    // maximum number of coarening layer in refinement (stop coarsening even if the number of node left is larger than "numNodeLeft")
+    string coarsenScheme = "MHEC";    // coarsening scheme when coarsening (HEC/MHEC)
+    string coarsenScheme_r = "MHEC"; // coarsening scheme when doing refinement (HEC/MHEC)
+    string initialParScheme = "FM";
+    string uncoarsenScheme = "FM";
+    string uncoarsenScheme_r = "FM";
+};
 
 class Hmetis
 {
@@ -26,11 +39,11 @@ public:
     // int uncoarCnt = 0;
     // multiset<pair<double, pair<int, int>>> sizeOrder;
 
-    // build graph by the given box
-    // void configureGraph(BOX &box);
+    //build graph by the given box
+    void configureGraph(parser& the_parser);
 
-    // // output partitioned graph to the given box
-    // void outputGraph(BOX &box);
+    // output partitioned graph to the given box
+    void outputGraph();
 
     // hmetis coarsening
     // bool for if the coarsening is "restricted"

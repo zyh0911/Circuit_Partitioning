@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <unordered_set>
+#include <set>
+#include <map>
 #include <cfloat>
 #include <iostream>
 class parser
@@ -10,10 +12,13 @@ class parser
 public:
     parser() {}
 
-    void read(const std::string& filename);
+    void read(const std::string &filename);
+    void update();
     void write();
+    std::vector<std::vector<int>> edges;
+    std::set<int> nodes;
+    std::map<int,int> mapping;
 private:
-    std::vector< std::vector<int>> edges;
 };
 
 class HyperNode

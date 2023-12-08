@@ -13,58 +13,46 @@
 #include <float.h>
 #include <algorithm>
 
-// build graph by the given box
-// void Hmetis::configureGraph(BOX &box)
-// {
-//     graph = new Hypergraph(box.instLib.size() - 1, box.net.size() - 1);
+void Hmetis::configureGraph(parser &the_parser)
+{
+    graph = new Hypergraph(the_parser.nodes.size(), the_parser.edges.size());
+    // std::cout << "1111" << std::endl;
+    //  std::cout << the_parser.nodes.size() << " " << the_parser.edges.size() << std::endl;
+    //  for (const auto& node:the_parser.nodes )
+    //  {
+    //      std::cout << node << std::endl;
+    //  }
+    for (int i = 0; i < the_parser.edges.size() - 1; i++)
+    {
+        std::vector<int> hEdge;
+        for (const auto &node : the_parser.edges.at(i))
+        {
+            hEdge.emplace_back(the_parser.mapping.at(node));
+        }
+        graph->addNodeList(i, hEdge);
+    }
+    for (int i = 1; i < the_parser.nodes.size(); i++)
+    {
+        graph->setNodeSizeOf(i - 1, 1, 0);
+        graph->setNodeSizeOf(i - 1, 1, 1);
+    }
+    spaceLimit.push_back(0.01);
+    spaceLimit.push_back(0.01);
+    graph->setTerminalSize(0);
+}
 
-//     for (int i = 1; i < box.net.size(); i++)
-//     {
-//         std::vector<int> hEdge;
-//         std::vector<bool> used(graph->getNodeNum(), false);
+// output partitioned graph to the given box
+void Hmetis::outputGraph()
+{
+    LayerInfo *inst = Instances.front();
 
-//         for (int j = 0; j < box.net[i].size(); j++)
-//         {
-//             int idx = box.net[i][j].first - 1;
-//             if (!used[idx])
-//             {
-//                 hEdge.emplace_back(idx);
-//                 used[idx] = true;
-//             }
-//         }
-//         graph->addNodeList(i - 1, hEdge);
-//     }
+    for (int i = 0; i < graph->getNodeNum(); i++)
+    {
+        std::cout << i << " " << inst->getPartitionOf(i) << std::endl;
+    }
 
-//     double tmpNodeSize0, tmpNodeSize1;
-//     double totalNodeSize = 0;
-//     int boardTech0 = box.boardTech[0], boardTech1 = box.boardTech[1];
-//     for (int i = 1; i < box.instLib.size(); i++)
-//     {
-//         tmpNodeSize0 = box.cellLib[box.instLib[i]].sizeX[boardTech0] * box.cellLib[box.instLib[i]].sizeY[boardTech0];
-//         tmpNodeSize1 = box.cellLib[box.instLib[i]].sizeX[boardTech1] * box.cellLib[box.instLib[i]].sizeY[boardTech1];
-//         totalNodeSize += tmpNodeSize1;
-//         graph->setNodeSizeOf(i - 1, tmpNodeSize0, 0);
-//         graph->setNodeSizeOf(i - 1, tmpNodeSize1, 1);
-//     }
-
-//     spaceLimit.push_back((double(box.dieurX - box.diellX) * double(box.dieurY - box.diellY)) * double(box.TopDieMaxUtil) / 100.0);
-//     spaceLimit.push_back((double(box.dieurX - box.diellX) * double(box.dieurY - box.diellY)) * double(box.BottomDieMaxUtil) / 100.0);
-
-//     graph->setTerminalSize((box.terminalSizeX + 2 * box.terminalSpace) * (box.terminalSizeY + 2 * box.terminalSpace));
-// }
-
-// // output partitioned graph to the given box
-// void Hmetis::outputGraph(BOX &box)
-// {
-//     LayerInfo *inst = Instances.front();
-
-//     for (int i = 0; i < graph->getNodeNum(); i++)
-//     {
-//         box.layer[i + 1] = inst->getPartitionOf(i);
-//     }
-
-//     delete inst;
-//}
+    delete inst;
+}
 
 // hmetis coarsening
 // 'num' is the number of nodes left after coarsening
@@ -136,7 +124,7 @@ void Hmetis::initialPartition(int num, std::string scheme)
 {
     // make sure the hypergraph can be partitioned under space limit
     preIPAdjustment();
-
+    std::cout << "1111" << std::endl;
     // graph->buildNeighbors();
 
     std::vector<partition_info> infos;
@@ -145,13 +133,13 @@ void Hmetis::initialPartition(int num, std::string scheme)
         LayerInfo *inst = new LayerInfo(graph);
         infos.push_back(partition_info(graph, inst, spaceLimit, scheme));
     }
-
+    std::cout << "1111" << std::endl;
     std::vector<std::thread> threads;
     for (int i = 0; i < num; i++)
     {
         threads.push_back(std::thread(IPwrapper, infos[i]));
     }
-
+    std::cout << "1111" << std::endl;
     for (int i = 0; i < num; i++)
     {
         threads[i].join();

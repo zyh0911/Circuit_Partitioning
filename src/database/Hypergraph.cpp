@@ -48,10 +48,12 @@ void parser::read(const std::string& filename)
                 for (int i = 1; i < words.size(); i++)
                 {
                     edges.back().emplace_back(std::stoi(words.at(i)));
+                    nodes.insert(std::stoi(words.at(i)));
                 }
             }
         }
     }
+    update();
 }
 
 void parser::write()
@@ -64,6 +66,16 @@ void parser::write()
         std::cout<<std::endl;
     }
 }
+
+void parser::update()
+{   
+    int i=0;
+    for(const auto& node:nodes){
+       mapping.emplace(node,i);
+       i++;
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////// HyperNode////////////////////////////////////
