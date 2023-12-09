@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
     db.refine(config.numNodeLeft, config.dropRate, config.coarsenScheme_r,
               config.uncoarsenScheme_r, config.maxRefineIter);
     std::cout << "---------" << std::endl;
+
     db.outputGraph();
     std::cout << "---------" << std::endl;
   } else if (argc > 2) {
