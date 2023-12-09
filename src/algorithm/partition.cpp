@@ -242,8 +242,6 @@ void FM::Partition() {
 
   inst->setp0size(partSize[0]);
   inst->setp1size(partSize[1]);
-  inst->computeTotalTerminalSize(graph);
-  if (inst->getTotalTerminalSize() > spaceLimit[0])
-    enableTerminalSize(graph, inst, spaceLimit);
+
   inst->computePartitionScore(graph);
 }

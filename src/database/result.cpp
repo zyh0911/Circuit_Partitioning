@@ -12,8 +12,6 @@ double result::getPartitionScore() { return partScore; }
 
 int result::getPartitionOf(int idx) { return part[idx]; }
 
-double result::getTotalTerminalSize() { return totalTerminalSize; }
-
 void result::setp0size(double size) { p0size = size; }
 
 void result::setp1size(double size) { p1size = size; }
@@ -22,29 +20,6 @@ void result::setPartitionScore(double size) { partScore = size; }
 
 void result::setPartitionOf(int idx, int p) { part[idx] = p; }
 
-void result::setTotalTerminalSize(double size) { totalTerminalSize = size; }
-
-void result::computeTotalTerminalSize(Hypergraph *g) {
-  double score = 0, terminalSize = g->getTerminalSize();
-
-  for (int i = 0; i < g->getEdgeNum(); i++) {
-    if (!g->getEdgeExistOf(i))
-      continue;
-
-    std::vector<int> &nds = g->getNodesOf(i);
-    int count = g->getNodeNumOf(i);
-    int part = getPartitionOf(nds[0]);
-
-    for (auto it = nds.begin(); it != nds.begin() + count; it++) {
-      if (getPartitionOf(*it) != part) {
-        score += terminalSize;
-        break;
-      }
-    }
-  }
-
-  setTotalTerminalSize(score);
-}
 
 // count and set hypergraph partition score
 void result::computePartitionScore(Hypergraph *g) {
@@ -85,7 +60,6 @@ bool result::bfsPlacing(Hypergraph *graph, std::vector<double> &spaceLimit) {
   std::mt19937 gen(rd());
 
   int hnodeSize = graph->getAllNodes().size(), num = 5;
-  double terminalSize = graph->getTerminalSize();
 
   while (num-- > 0) {
     std::vector<bool> nodesPicked(graph->getAllNodes().size(), false);
@@ -147,10 +121,7 @@ bool result::bfsPlacing(Hypergraph *graph, std::vector<double> &spaceLimit) {
     setp1size(p1size);
     // if (graph->getp2size() > spaceLimit[1]) enableDieSizeLimit(graph,
     // spaceLimit);
-    computeTotalTerminalSize(graph);
-    // if (graph->getTotalTerminalSize() > spaceLimit[0])
-    // enableTerminalSizeLimit(graph, spaceLimit);
-    if (getTotalTerminalSize() <= spaceLimit[0] && p1size <= spaceLimit[1])
+    if ( p1size <= spaceLimit[1])
       return true;
 
     this->~result();

@@ -61,8 +61,5 @@ public:
   // return sorted node idx in non-decreasing node size order
   std::vector<int> sortNode(Hypergraph *);
 
-  // reduce total terminal size to fit the limit in initial partition
-  void enableTerminalSizeLimit(Hypergraph *, std::vector<int> &);
-
   void preIPAdjustment();
 };

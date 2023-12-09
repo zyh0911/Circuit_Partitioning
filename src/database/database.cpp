@@ -31,7 +31,6 @@ void database::configureGraph(parser &the_parser) {
   }
   spaceLimit.push_back(the_parser.nodes.size() / 2);
   spaceLimit.push_back(the_parser.nodes.size() / 2);
-  graph->setTerminalSize(0);
 }
 
 // output partitioned graph to the given box

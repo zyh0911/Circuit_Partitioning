@@ -36,51 +36,10 @@ inline int computeGain(Hypergraph *graph, result *inst, int nodeIdx) {
   return gain;
 }
 
-inline void enableTerminalSize(Hypergraph *graph, result *inst,
-                               std::vector<double> &spaceLimit) {
-  // reduce total terminal size
-  double totalTerminalSize = inst->getTotalTerminalSize(),
-         terminalSize = graph->getTerminalSize();
-  double size0 = inst->getp0size(), size1 = inst->getp1size();
-
-  while (totalTerminalSize > spaceLimit[0]) {
-    for (int i = 0; i < graph->getNodeNum(); i++) {
-      double nodeSize0 = graph->getNodeSizeOf(i, 0),
-             nodeSize1 = graph->getNodeSizeOf(i, 1);
-      if (size1 + nodeSize1 > spaceLimit[1] ||
-          size0 + nodeSize0 > spaceLimit[0])
-        continue;
-
-      int gain = computeGain(graph, inst, i);
-      if (gain <= 0)
-        continue;
-
-      int part = inst->getPartitionOf(i), partTo = (part == 0) ? 1 : 0;
-      if (part == 0) {
-        size0 -= nodeSize0;
-        size1 += nodeSize1;
-      } else {
-        size0 += nodeSize0;
-        size1 -= nodeSize1;
-      }
-
-      inst->setPartitionOf(i, partTo);
-      totalTerminalSize += ((-1) * gain * terminalSize);
-      if (totalTerminalSize <= spaceLimit[0])
-        break;
-    }
-  }
-
-  inst->setp0size(size0);
-  inst->setp1size(size1);
-  inst->setTotalTerminalSize(totalTerminalSize);
-}
 
 inline int myrandom(int i) { return std::rand() % i; }
 
 inline void HER(Hypergraph *graph, result *inst, vector<double> &spaceLimit) {
-  double terminalSize = graph->getTerminalSize(),
-         totalTerminalSize = inst->getTotalTerminalSize();
   double p1size = inst->getp0size(), p2size = inst->getp1size();
   vector<int> he;
   for (int i = 0; i < graph->getAllEdges().size(); i++)
@@ -171,39 +130,32 @@ inline void HER(Hypergraph *graph, result *inst, vector<double> &spaceLimit) {
         }
       }
     }
-
-    // check if the shift fit the spacing limitations
-    double terminalSizeTo1 = gain2to1 * (-1) * terminalSize,
-           terminalSizeTo2 = gain1to2 * (-1) * terminalSize;
+ 
     if (gain1to2 > gain2to1 && gain1to2 > 0 &&
         abs(0.5 - (p1size - size1in1) / (p1size + p2size)) <= 0.25 &&
         abs(0.5 - (p2size + size1in2) / (p1size + p2size)) <= 0.25 &&
-        (p2size + size1in2) <= spaceLimit[1] &&
-        (totalTerminalSize + terminalSizeTo2) <= spaceLimit[0]) {
+        (p2size + size1in2) <= spaceLimit[1]) {
       for (auto itt = p1v.begin(); itt != p1v.end(); itt++) {
         inst->setPartitionOf((*itt), 1);
       }
       p1size -= size1in1;
       p2size += size1in2;
-      totalTerminalSize += terminalSizeTo2;
+  
     } else if (gain1to2 < gain2to1 && gain2to1 > 0 &&
                abs(0.5 - (p1size + size2in1) / (p1size + p2size)) <= 0.25 &&
                abs(0.5 - (p2size - size2in2) / (p1size + p2size)) <= 0.25 &&
-               (p1size + size2in1) <= spaceLimit[0] &&
-               (totalTerminalSize + terminalSizeTo1) <= spaceLimit[0]) {
+               (p1size + size2in1) <= spaceLimit[0]) {
       for (auto itt = p2v.begin(); itt != p2v.end(); itt++) {
         inst->setPartitionOf((*itt), 0);
       }
       p1size += size2in1;
       p2size -= size2in2;
-      totalTerminalSize += terminalSizeTo1;
     }
   }
 
   inst->setp0size(p1size);
   inst->setp1size(p2size);
   inst->computePartitionScore(graph);
-  inst->setTotalTerminalSize(totalTerminalSize);
 }
 
 class FM {

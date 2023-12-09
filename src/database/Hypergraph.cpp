@@ -61,7 +61,7 @@ void Hypergraph::addNodeList(int edge_id, std::vector<int> &vtxs) {
   }
 
   HyperEdge *newEdge =
-      new HyperEdge(vtxs, 1.0 / (static_cast<double>(vtxs.size()) - 1.0));
+      new HyperEdge(vtxs, 1.0 );
   edges.emplace_back(newEdge);
 }
 
@@ -100,9 +100,6 @@ double Hypergraph::getEdgeWeightOf(int e) { return edges[e]->getEdgeWeight(); }
 std::vector<int> &Hypergraph::getNeighborsOf(int n) {
   return nodes[n]->getNeighbors();
 }
-
-// return terminal size
-double Hypergraph::getTerminalSize() { return terminalSize; }
 
 std::pair<int, std::vector<int> *>
 Hypergraph::coarseNodes(std::vector<int> *nds) {
@@ -170,8 +167,6 @@ void Hypergraph::setNodeSizeOf(int idx, double size, int layer) {
     nodes[idx]->setNodeSize1(size);
 }
 
-// set terminal size
-void Hypergraph::setTerminalSize(double size) { terminalSize = size; }
 
 // build and merge neighbors of all nodes after coarsening
 void Hypergraph::buildNeighbors() {

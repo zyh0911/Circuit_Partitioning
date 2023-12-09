@@ -70,14 +70,13 @@ private:
   std::vector<HyperNode *> nodes;
   std::vector<HyperEdge *> edges;
   std::vector<bool> nodeExist, edgeExist;
-  double terminalSize;
   int nodeNum;
 
 public:
-  Hypergraph() : nodes({}), edges({}), terminalSize(0){};
+  Hypergraph() : nodes({}), edges({}){};
   Hypergraph(int nvtxs, int nedges)
       : edges({}), nodeExist(std::vector<bool>(nvtxs, true)),
-        edgeExist(std::vector<bool>(nedges, true)), terminalSize(0),
+        edgeExist(std::vector<bool>(nedges, true)),
         nodeNum(nvtxs) {
     nodes.reserve(nvtxs);
     for (int i = 0; i < nvtxs; i++)
@@ -124,9 +123,6 @@ public:
   // return neighbors of the given node index
   std::vector<int> &getNeighborsOf(int);
 
-  // return terminal size
-  double getTerminalSize();
-
   std::pair<int, std::vector<int> *> coarseNodes(std::vector<int> *);
 
   int getNodeNumOf(int);
@@ -150,9 +146,6 @@ public:
   // set node size on the given layer
   void setNodeSizeOf(int, double, int);
 
-  // set terminal size
-  void setTerminalSize(double);
-
   // build and merge neighbors of all nodes after coarsening
   void buildNeighbors();
 
@@ -160,9 +153,6 @@ public:
 
   // check if the size of the given node vector is under space limit
   bool sizeUnderLimit(std::vector<int> &, int, int, double);
-
-  // calculate and set terminal size sum
-  void countTotalTerminalSize();
 
   // display current graph in database format
   void displayGraph();

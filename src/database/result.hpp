@@ -21,12 +21,12 @@
 class result {
 private:
   std::vector<int> part;
-  double p0size, p1size, partScore, totalTerminalSize;
+  double p0size, p1size, partScore;
 
 public:
   result(Hypergraph *g)
       : part(std::vector<int>(g->getAllNodes().size(), 1)), p0size(0),
-        partScore(DBL_MAX), totalTerminalSize(0.0) {
+        partScore(DBL_MAX){
     p1size = 0;
     for (int i = 0; i < g->getAllNodes().size(); i++)
       if (g->getNodeExistOf(i))
@@ -41,8 +41,6 @@ public:
 
   int getPartitionOf(int);
 
-  double getTotalTerminalSize();
-
   void setp0size(double);
 
   void setp1size(double);
@@ -50,10 +48,6 @@ public:
   void setPartitionScore(double);
 
   void setPartitionOf(int, int);
-
-  void setTotalTerminalSize(double);
-
-  void computeTotalTerminalSize(Hypergraph *);
 
   void computePartitionScore(Hypergraph *);
 
