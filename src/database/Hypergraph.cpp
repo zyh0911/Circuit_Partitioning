@@ -28,17 +28,9 @@ std::vector<int> &HyperNode::getEdges() { return edges; }
 // return all neighbors of the hypernode
 std::vector<int> &HyperNode::getNeighbors() { return neighbors; }
 
-// return node size on layer 0
-double HyperNode::getNodeSize0() { return size0; }
+double HyperNode::getNodeWeight() { return weight; }
 
-// return node size on layer 1
-double HyperNode::getNodeSize1() { return size1; }
-
-// set node size on layer 0
-void HyperNode::setNodeSize0(double n) { size0 = n; }
-
-// set node size on layer 1
-void HyperNode::setNodeSize1(double n) { size1 = n; }
+void HyperNode::setNodeWeight(double n) { weight = n; }
 
 /////////////////////////////////////////////////////////////////////
 ///////////////////////// HyperEdge//////////////////////////////////
@@ -60,8 +52,7 @@ void Hypergraph::addNodeList(int edge_id, std::vector<int> &vtxs) {
     nodes[vtxs[i]]->addEdge(edge_id);
   }
 
-  HyperEdge *newEdge =
-      new HyperEdge(vtxs, 1.0 );
+  HyperEdge *newEdge = new HyperEdge(vtxs, 1.0);
   edges.emplace_back(newEdge);
 }
 
@@ -86,12 +77,7 @@ int Hypergraph::getNodeNum() { return nodeNum; }
 // return edge number
 int Hypergraph::getEdgeNum() { return edges.size(); }
 
-double Hypergraph::getNodeSizeOf(int n, int layer) {
-  if (layer == 0)
-    return nodes[n]->getNodeSize0();
-  else
-    return nodes[n]->getNodeSize1();
-}
+double Hypergraph::getNodeWeightOf(int n) { return nodes[n]->getNodeWeight(); }
 
 // return edge weight of the edge
 double Hypergraph::getEdgeWeightOf(int e) { return edges[e]->getEdgeWeight(); }
@@ -104,11 +90,10 @@ std::vector<int> &Hypergraph::getNeighborsOf(int n) {
 std::pair<int, std::vector<int> *>
 Hypergraph::coarseNodes(std::vector<int> *nds) {
   int minIdx = *std::min_element(nds->begin(), nds->end());
-  double size0 = 0, size1 = 0;
+  double weight = 0;
 
   for (auto it = nds->begin(); it != nds->end(); it++) {
-    size0 += getNodeSizeOf(*it, 0);
-    size1 += getNodeSizeOf(*it, 1);
+    weight += getNodeWeightOf(*it);
 
     if (*it == minIdx)
       continue;
@@ -133,8 +118,7 @@ Hypergraph::coarseNodes(std::vector<int> *nds) {
     }
   }
 
-  setNodeSizeOf(minIdx, size0, 0);
-  setNodeSizeOf(minIdx, size1, 1);
+  setNodeWeightOf(minIdx, weight);
 
   return std::make_pair(minIdx, nds);
 }
@@ -159,14 +143,9 @@ void Hypergraph::setNodeNumOf(int e_idx, int num) {
 
 void Hypergraph::setNodeNum(int num) { nodeNum = num; }
 
-// set node size on layer 0
-void Hypergraph::setNodeSizeOf(int idx, double size, int layer) {
-  if (layer == 0)
-    nodes[idx]->setNodeSize0(size);
-  else
-    nodes[idx]->setNodeSize1(size);
+void Hypergraph::setNodeWeightOf(int idx, double size) {
+  nodes[idx]->setNodeWeight(size);
 }
-
 
 // build and merge neighbors of all nodes after coarsening
 void Hypergraph::buildNeighbors() {
@@ -193,7 +172,7 @@ void Hypergraph::revertGraph(
     std::vector<std::pair<int, std::vector<int> *>> *coarsenInfo) {
   for (auto it = coarsenInfo->rbegin(); it != coarsenInfo->rend(); it++) {
     int base = it->first;
-    double size0 = getNodeSizeOf(base, 0), size1 = getNodeSizeOf(base, 1);
+    double weight = getNodeWeightOf(base);
     std::vector<bool> edgeConnected(edges.size(), false);
     std::vector<int> &eds = getEdgesOf(base);
     std::vector<int> *nds = it->second;
@@ -225,22 +204,20 @@ void Hypergraph::revertGraph(
         }
       }
 
-      size0 -= getNodeSizeOf(*itt, 0);
-      size1 -= getNodeSizeOf(*itt, 1);
+      weight -= getNodeWeightOf(*itt);
     }
 
-    setNodeSizeOf(base, size0, 0);
-    setNodeSizeOf(base, size1, 1);
+    setNodeWeightOf(base, weight);
     nodeNum = nodeNum + nds->size() - 1;
   }
 }
 
 // check if the size of the given node vector is under space limit
 bool Hypergraph::sizeUnderLimit(std::vector<int> &nodesConnected, int count,
-                                int part, double totalSize) {
+                                double totalSize) {
   for (auto it = nodesConnected.begin(); it != nodesConnected.begin() + count;
        it++) {
-    totalSize -= getNodeSizeOf(*it, part);
+    totalSize -= getNodeWeightOf(*it);
     if (totalSize < 0)
       return false;
   }

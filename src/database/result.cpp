@@ -20,7 +20,6 @@ void result::setPartitionScore(double size) { partScore = size; }
 
 void result::setPartitionOf(int idx, int p) { part[idx] = p; }
 
-
 // count and set hypergraph partition score
 void result::computePartitionScore(Hypergraph *g) {
   double score = DBL_MIN;
@@ -108,11 +107,10 @@ bool result::bfsPlacing(Hypergraph *graph, std::vector<double> &spaceLimit) {
       }
 
       // check if the shift fit the spacing limitations
-      double size0 = graph->getNodeSizeOf(top, 0),
-             size1 = graph->getNodeSizeOf(top, 1);
-      if (!(p0size + size0 > spaceLimit[0])) {
-        p0size += size0;
-        p1size -= size1;
+      double weight = graph->getNodeWeightOf(top);
+      if (!(p0size + weight > spaceLimit[0])) {
+        p0size += weight;
+        p1size -= weight;
         setPartitionOf(top, 0);
       }
     }
@@ -121,7 +119,7 @@ bool result::bfsPlacing(Hypergraph *graph, std::vector<double> &spaceLimit) {
     setp1size(p1size);
     // if (graph->getp2size() > spaceLimit[1]) enableDieSizeLimit(graph,
     // spaceLimit);
-    if ( p1size <= spaceLimit[1])
+    if (p1size <= spaceLimit[1])
       return true;
 
     this->~result();

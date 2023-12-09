@@ -12,12 +12,13 @@ class HyperNode {
 private:
   std::vector<int> edges;
   std::vector<int> neighbors;
-  double size0, size1;
+  double weight = 1.0;
 
 public:
-  HyperNode() : edges({}), neighbors({}), size0(0.0), size1(0.0){};
-  HyperNode(double nodeSize0, double nodeSize1, int part)
-      : edges({}), neighbors({}), size0(nodeSize0), size1(nodeSize1){};
+  HyperNode() : edges({}), neighbors({}), weight(0.0){};
+  HyperNode(double weight, int part)
+      : edges({}), neighbors({}), weight(weight){};
+
   // add an edge to the hypernode
   void addEdge(int);
 
@@ -27,17 +28,9 @@ public:
   // return all neighbors of the hypernode
   std::vector<int> &getNeighbors();
 
-  // return node size on layer 0
-  double getNodeSize0();
+  double getNodeWeight();
 
-  // return node size on layer 1
-  double getNodeSize1();
-
-  // set node size on layer 0
-  void setNodeSize0(double);
-
-  // set node size on layer 1
-  void setNodeSize1(double);
+  void setNodeWeight(double);
 };
 
 class HyperEdge {
@@ -76,8 +69,7 @@ public:
   Hypergraph() : nodes({}), edges({}){};
   Hypergraph(int nvtxs, int nedges)
       : edges({}), nodeExist(std::vector<bool>(nvtxs, true)),
-        edgeExist(std::vector<bool>(nedges, true)),
-        nodeNum(nvtxs) {
+        edgeExist(std::vector<bool>(nedges, true)), nodeNum(nvtxs) {
     nodes.reserve(nvtxs);
     for (int i = 0; i < nvtxs; i++)
       nodes.push_back(new HyperNode());
@@ -114,8 +106,8 @@ public:
   // return edge number
   int getEdgeNum();
 
-  // return node size of the given layer
-  double getNodeSizeOf(int, int);
+  // return node Weight
+  double getNodeWeightOf(int);
 
   // return edge weight of the node
   double getEdgeWeightOf(int);
@@ -143,8 +135,7 @@ public:
 
   void setNodeNum(int);
 
-  // set node size on the given layer
-  void setNodeSizeOf(int, double, int);
+  void setNodeWeightOf(int, double);
 
   // build and merge neighbors of all nodes after coarsening
   void buildNeighbors();
@@ -152,7 +143,7 @@ public:
   void revertGraph(std::vector<std::pair<int, std::vector<int> *>> *);
 
   // check if the size of the given node vector is under space limit
-  bool sizeUnderLimit(std::vector<int> &, int, int, double);
+  bool sizeUnderLimit(std::vector<int> &, int, double);
 
   // display current graph in database format
   void displayGraph();

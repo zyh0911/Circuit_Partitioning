@@ -12,12 +12,7 @@
 
 void database::configureGraph(parser &the_parser) {
   graph = new Hypergraph(the_parser.nodes.size(), the_parser.edges.size());
-  // std::cout << "1111" << std::endl;
-  //  std::cout << the_parser.nodes.size() << " " << the_parser.edges.size() <<
-  //  std::endl; for (const auto& node:the_parser.nodes )
-  //  {
-  //      std::cout << node << std::endl;
-  //  }
+
   for (int i = 0; i < the_parser.edges.size() - 1; i++) {
     std::vector<int> hEdge;
     for (const auto &node : the_parser.edges.at(i)) {
@@ -26,8 +21,7 @@ void database::configureGraph(parser &the_parser) {
     graph->addNodeList(i, hEdge);
   }
   for (int i = 1; i < the_parser.nodes.size(); i++) {
-    graph->setNodeSizeOf(i - 1, 1, 0);
-    graph->setNodeSizeOf(i - 1, 1, 1);
+    graph->setNodeWeightOf(i - 1, 1.0);
   }
   spaceLimit.push_back(the_parser.nodes.size() / 2);
   spaceLimit.push_back(the_parser.nodes.size() / 2);
@@ -47,6 +41,7 @@ void database::outputGraph() {
     }
   }
   std::cout << num0 << " " << num1 << std::endl;
+  std::cout << inst->getPartitionScore() << std::endl;
   delete inst;
 }
 

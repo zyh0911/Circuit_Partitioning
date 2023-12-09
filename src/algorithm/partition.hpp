@@ -36,7 +36,6 @@ inline int computeGain(Hypergraph *graph, result *inst, int nodeIdx) {
   return gain;
 }
 
-
 inline int myrandom(int i) { return std::rand() % i; }
 
 inline void HER(Hypergraph *graph, result *inst, vector<double> &spaceLimit) {
@@ -57,19 +56,17 @@ inline void HER(Hypergraph *graph, result *inst, vector<double> &spaceLimit) {
     vector<int> edgesToUpdate;
     vector<bool> nodesRelated(graph->getAllNodes().size(), false),
         edgesRelated(graph->getAllEdges().size(), false);
-    double size1in1 = 0, size1in2 = 0, size2in1 = 0, size2in2 = 0;
+    double weight1 = 0, weight2 = 0;
     int gain1to2 = 0, gain2to1 = 0;
     int count = graph->getNodeNumOf(*it);
 
     for (auto itt = nodes.begin(); itt != nodes.begin() + count; itt++) {
       if (inst->getPartitionOf(*itt) == 0) {
         p1v.push_back(*itt);
-        size1in1 += graph->getNodeSizeOf(*itt, 0);
-        size1in2 += graph->getNodeSizeOf(*itt, 1);
+        weight1 += graph->getNodeWeightOf(*itt);
       } else {
         p2v.push_back(*itt);
-        size2in1 += graph->getNodeSizeOf(*itt, 0);
-        size2in2 += graph->getNodeSizeOf(*itt, 1);
+        weight2 += graph->getNodeWeightOf(*itt);
       }
 
       vector<int> &edges_ = graph->getEdgesOf(*itt);
@@ -130,26 +127,24 @@ inline void HER(Hypergraph *graph, result *inst, vector<double> &spaceLimit) {
         }
       }
     }
- 
+
     if (gain1to2 > gain2to1 && gain1to2 > 0 &&
-        abs(0.5 - (p1size - size1in1) / (p1size + p2size)) <= 0.25 &&
-        abs(0.5 - (p2size + size1in2) / (p1size + p2size)) <= 0.25 &&
-        (p2size + size1in2) <= spaceLimit[1]) {
+        abs(0.5 - (p1size - weight1) / (p1size + p2size)) <= 0.25 &&
+        (p2size + weight1) <= spaceLimit[1]) {
       for (auto itt = p1v.begin(); itt != p1v.end(); itt++) {
         inst->setPartitionOf((*itt), 1);
       }
-      p1size -= size1in1;
-      p2size += size1in2;
-  
+      p1size -= weight1;
+      p2size += weight1;
+
     } else if (gain1to2 < gain2to1 && gain2to1 > 0 &&
-               abs(0.5 - (p1size + size2in1) / (p1size + p2size)) <= 0.25 &&
-               abs(0.5 - (p2size - size2in2) / (p1size + p2size)) <= 0.25 &&
-               (p1size + size2in1) <= spaceLimit[0]) {
+               abs(0.5 - (p1size + weight2) / (p1size + p2size)) <= 0.25 &&
+               (p1size + weight2) <= spaceLimit[0]) {
       for (auto itt = p2v.begin(); itt != p2v.end(); itt++) {
         inst->setPartitionOf((*itt), 0);
       }
-      p1size += size2in1;
-      p2size -= size2in2;
+      p1size += weight2;
+      p2size -= weight2;
     }
   }
 

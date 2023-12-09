@@ -149,8 +149,8 @@ void FM::updateDataStructure(int n_idx) {
     pv[partTo][*it]++;
   }
 
-  partSize[partTo] += graph->getNodeSizeOf(n_idx, partTo);
-  partSize[part] -= graph->getNodeSizeOf(n_idx, part);
+  partSize[partTo] += graph->getNodeWeightOf(n_idx);
+  partSize[part] -= graph->getNodeWeightOf(n_idx);
   inst->setPartitionOf(n_idx, partTo);
 }
 
@@ -167,8 +167,7 @@ int FM::selectVictimNode() {
 
       int part = inst->getPartitionOf(*it), partTo = part == 0 ? 1 : 0;
 
-      if (partSize[partTo] + graph->getNodeSizeOf(*it, partTo) >
-          spaceLimit[partTo])
+      if (partSize[partTo] + graph->getNodeWeightOf(*it) > spaceLimit[partTo])
         continue;
 
       locked[*it] = true;

@@ -26,11 +26,11 @@ private:
 public:
   result(Hypergraph *g)
       : part(std::vector<int>(g->getAllNodes().size(), 1)), p0size(0),
-        partScore(DBL_MAX){
+        partScore(DBL_MAX) {
     p1size = 0;
     for (int i = 0; i < g->getAllNodes().size(); i++)
       if (g->getNodeExistOf(i))
-        p1size += g->getNodeSizeOf(i, 1);
+        p1size += g->getNodeWeightOf(i);
   }
 
   double getp0size();

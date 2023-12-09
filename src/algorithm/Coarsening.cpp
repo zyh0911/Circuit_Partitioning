@@ -86,7 +86,7 @@ int EC_Coarsening::chooseMaxWeight(Hypergraph *graph, result *inst,
   // edges connected to node n1
   std::vector<int> &edges = graph->getEdgesOf(n1);
   int nMax = n1, part = inst->getPartitionOf(n1);
-  double maxWeight = 0, size = graph->getNodeSizeOf(n1, part);
+  double maxWeight = 0, weight = graph->getNodeWeightOf(n1);
 
   for (auto it = edges.begin(); it != edges.end(); it++) {
     std::vector<int> &neigs = graph->getNodesOf(*it);
@@ -100,7 +100,7 @@ int EC_Coarsening::chooseMaxWeight(Hypergraph *graph, result *inst,
         continue;
 
       if (ndsRemain[*itt] && nodeWeights[*itt] > maxWeight &&
-          graph->getNodeSizeOf(*itt, part) + size <= spaceLimit[part]) {
+          graph->getNodeWeightOf(*itt) + weight <= spaceLimit[part]) {
         maxWeight = nodeWeights[*itt];
         nMax = *itt;
       }
@@ -131,7 +131,7 @@ HEC_Coarsening::Coarsening(Hypergraph *graph, result *inst,
     if ((!restricted ||
          (restricted && preservePartition(inst, nodesConnected, count))) &&
         nodesNotMatched(nodesConnected, count, nodesRemain) &&
-        graph->sizeUnderLimit(nodesConnected, count, part, spaceLimit[part])) {
+        graph->sizeUnderLimit(nodesConnected, count, spaceLimit[part])) {
       std::vector<int> *nds = new std::vector<int>();
 
       for (auto it = nodesConnected.begin();
@@ -157,22 +157,22 @@ HEC_Coarsening::Coarsening(Hypergraph *graph, result *inst,
       std::vector<int> *unmatchedNodes0 = new std::vector<int>();
       std::vector<int> *unmatchedNodes1 = new std::vector<int>();
       int count = graph->getNodeNumOf(*e_it);
-      double size0 = 0, size1 = 0;
+      double weight0 = 0, weight1 = 0;
 
       for (auto it = nodesConnected.begin();
            it != nodesConnected.begin() + count; it++) {
         if (nodesRemain[*it]) {
           if (inst->getPartitionOf(*it) == 0) {
             unmatchedNodes0->push_back(*it);
-            size0 += graph->getNodeSizeOf(*it, 0);
+            weight0 += graph->getNodeWeightOf(*it);
           } else {
             unmatchedNodes1->push_back(*it);
-            size1 += graph->getNodeSizeOf(*it, 1);
+            weight1 += graph->getNodeWeightOf(*it);
           }
         }
       }
 
-      if (!unmatchedNodes0->empty() && size0 <= spaceLimit[0]) {
+      if (!unmatchedNodes0->empty() && weight0 <= spaceLimit[0]) {
         auto info = graph->coarseNodes(unmatchedNodes0);
         coarsenInfo->push_back(info);
         nodeNum = nodeNum - unmatchedNodes0->size() + 1;
@@ -182,7 +182,7 @@ HEC_Coarsening::Coarsening(Hypergraph *graph, result *inst,
       } else
         delete unmatchedNodes0;
 
-      if (!unmatchedNodes1->empty() && size1 <= spaceLimit[1]) {
+      if (!unmatchedNodes1->empty() && weight1 <= spaceLimit[1]) {
         auto info = graph->coarseNodes(unmatchedNodes1);
         coarsenInfo->push_back(info);
         nodeNum = nodeNum - unmatchedNodes1->size() + 1;
