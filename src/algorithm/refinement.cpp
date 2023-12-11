@@ -1,4 +1,4 @@
-#include "partition.hpp"
+#include "refinement.hpp"
 
 // move node in gain bucket data structure
 void FM::updateGain(int idx, int delta) {

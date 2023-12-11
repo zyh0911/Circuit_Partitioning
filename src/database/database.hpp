@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../algorithm/Coarsening.hpp"
-#include "../algorithm/partition.hpp"
+#include "../algorithm/coarsening.hpp"
+#include "../algorithm/refinement.hpp"
 #include "Hypergraph.hpp"
 #include "info.hpp"
 #include "parser.hpp"

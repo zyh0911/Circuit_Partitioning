@@ -1,4 +1,4 @@
-#include "Coarsening.hpp"
+#include "coarsening.hpp"
 
 #include <algorithm>
 #include <numeric>
