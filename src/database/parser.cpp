@@ -48,4 +48,9 @@ void parser::update() {
     mapping.emplace(node, i);
     i++;
   }
+  for (const auto &pair : mapping) {
+    reserve_mapping.emplace(pair.second, pair.first);
+    i++;
+  }
+
 }

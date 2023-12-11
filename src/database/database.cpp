@@ -13,7 +13,7 @@
 void database::configureGraph(parser &the_parser) {
   graph = new Hypergraph(the_parser.nodes.size(), the_parser.edges.size());
 
-  for (int i = 0; i < the_parser.edges.size() - 1; i++) {
+  for (int i = 0; i < the_parser.edges.size() ; i++) {
     std::vector<int> hEdge;
     for (const auto &node : the_parser.edges.at(i)) {
       hEdge.emplace_back(the_parser.mapping.at(node));
@@ -28,11 +28,14 @@ void database::configureGraph(parser &the_parser) {
 }
 
 // output partitioned graph to the given box
-void database::outputGraph() {
+void database::outputGraph(parser &the_parser) {
   result *inst = Instances.front();
   int num0 = 0;
   int num1 = 0;
+  ofstream outputf1("1.txt", ofstream::trunc);
   for (int i = 0; i < graph->getNodeNum(); i++) {
+    outputf1 << the_parser.reserve_mapping.at(i) << " "
+            << inst->getPartitionOf(i) << std::endl;
     std::cout << i << " " << inst->getPartitionOf(i) << std::endl;
     if (inst->getPartitionOf(i) == 0) {
       num0++;
@@ -40,7 +43,41 @@ void database::outputGraph() {
       num1++;
     }
   }
-  std::cout << num0 << " " << num1 << std::endl;
+  outputf1.close();
+  ofstream outputf2("2.txt", ofstream::trunc);
+  for (int i=0;i< graph->getAllEdges().size();i++) {
+    // std::cout<<i;
+    // for (const auto &node : graph->getAllEdges().at(i)->getNodes()) {
+    //   std::cout<<" "<<node;
+    // }
+    // std::cout<<std::endl;
+    std::vector<int>  nodeinpart0;
+    std::vector<int>  nodeinpart1;
+    for (const auto &node : graph->getAllEdges().at(i)->getNodes()) {
+      if (inst->getPartitionOf(node) == 0) {
+        nodeinpart0.emplace_back(node);
+      } else {
+        nodeinpart1.emplace_back(node);
+      }
+    }
+    if(nodeinpart0.size()>1){
+      outputf2<<i;
+      for (const auto& node:nodeinpart0) {
+        outputf2<<" "<<node;
+      }
+      outputf2<<std::endl;
+    }
+    if(nodeinpart1.size()>1){
+      outputf2<<i;
+      for (const auto& node:nodeinpart1) {
+        outputf2<<" "<<node;
+      }
+      outputf2<<std::endl;
+    }
+  }
+
+  outputf2.close();
+  std::cout << num0 << " " << num1 <<" "<< graph->getAllEdges().size()<< std::endl;
   std::cout << inst->getPartitionScore() << std::endl;
   delete inst;
 }

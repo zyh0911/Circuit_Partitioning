@@ -9,10 +9,10 @@
 int main(int argc, char *argv[]) {
   if (argc == 1) {
     Config config;
-    std::string filename1 = "../../test/10000.txt";
+    std::string filename1 = "../../test/100.txt";
     parser the_parser;
     the_parser.read(filename1);
-    // the_parser.write();
+     the_parser.write();
     std::cout << "---------" << std::endl;
     database db = database();
     std::cout << "---------" << std::endl;
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
               config.uncoarsenScheme_r, config.maxRefineIter);
     std::cout << "---------" << std::endl;
 
-    db.outputGraph();
+    db.outputGraph(the_parser);
     std::cout << "---------" << std::endl;
   } else if (argc > 2) {
   }

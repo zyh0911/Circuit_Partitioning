@@ -28,7 +28,7 @@ public:
   void configureGraph(parser &the_parser);
 
   // output partitioned graph to the given box
-  void outputGraph();
+  void outputGraph(parser &the_parser);
 
   // database coarsening
   // bool for if the coarsening is "restricted"

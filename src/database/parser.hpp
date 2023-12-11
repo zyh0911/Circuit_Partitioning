@@ -17,6 +17,7 @@ public:
   std::vector<std::vector<int>> edges;
   std::set<int> nodes;
   std::map<int, int> mapping;
+  std::map<int, int> reserve_mapping;
 
 private:
 };
