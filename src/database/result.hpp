@@ -53,5 +53,7 @@ public:
 
   void mapPartition(std::vector<std::pair<int, std::vector<int> *>> *);
 
-  bool bfsPlacing(Hypergraph *, std::vector<double> &);
+  bool ggp(Hypergraph *, std::vector<double> &);
+
+  bool gggp(Hypergraph *, std::vector<double> &);
 };

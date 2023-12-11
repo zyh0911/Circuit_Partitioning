@@ -78,7 +78,7 @@ void database::coarsen(int num, bool restricted, std::string scheme,
 void database::preIPAdjustment() {
   result *inst = new result(graph);
 
-  while (!inst->bfsPlacing(graph, spaceLimit)) {
+  while (!inst->ggp(graph, spaceLimit)) {
     auto cf = coarsenInfo.back();
     coarsenInfo.pop_back();
     graph->revertGraph(cf);
@@ -96,7 +96,7 @@ void database::preIPAdjustment() {
 
 // wrapper of layer information
 void IPwrapper(partition_info info) {
-  while (!info.inst->bfsPlacing(info.graph, info.spaceLimit)) {
+  while (!info.inst->ggp(info.graph, info.spaceLimit)) {
     info.inst->~result();
     new (info.inst) result(info.graph);
   }
