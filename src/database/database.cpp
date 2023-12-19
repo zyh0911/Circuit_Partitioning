@@ -75,15 +75,15 @@ void database::outputGraph(parser &the_parser)
       }
       outputf2 << std::endl;
     }
-    if (nodeinpart1.size() > 1)
-    {
-      outputf2 << i;
-      for (const auto &node : nodeinpart1)
-      {
-        outputf2 << " " << node;
-      }
-      outputf2 << std::endl;
-    }
+    // if (nodeinpart1.size() > 1)
+    // {
+    //   outputf2 << i;
+    //   for (const auto &node : nodeinpart1)
+    //   {
+    //     outputf2 << " " << node;
+    //   }
+    //   outputf2 << std::endl;
+    // }
   }
 
   outputf2.close();
