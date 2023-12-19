@@ -34,7 +34,8 @@ void database::configureGraph(parser &the_parser)
 // output partitioned graph to the given box
 void database::outputGraph(parser &the_parser)
 {
-  result *inst = Instances.front();
+  // result *inst = Instances.front();
+  result *inst = results.at(idx);
   int num0 = 0;
   int num1 = 0;
   ofstream outputf1("1.txt", ofstream::trunc);
@@ -42,7 +43,7 @@ void database::outputGraph(parser &the_parser)
   {
     outputf1 << the_parser.reserve_mapping.at(i) << " "
              << inst->getPartitionOf(i) << std::endl;
-    std::cout << i << " " << inst->getPartitionOf(i) << std::endl;
+    // std::cout << i << " " << inst->getPartitionOf(i) << std::endl;
     if (inst->getPartitionOf(i) == 0)
     {
       num0++;
@@ -100,6 +101,21 @@ void database::outputGraph(parser &the_parser)
   delete inst;
 }
 
+bool database::check()
+{
+  result *inst = results.at(idx);
+  int num0 = inst->getp0size();
+  int num1 = inst->getp1size();
+
+  if (num0 == num1 or num0 + 1 == num1 or num0 == num1 + 1)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
 // database coarsening
 // 'numNodeLeft' is the number of nodes left after coarsening
 // 'restricted' for if the coarsen is restricted
@@ -255,7 +271,7 @@ void database::refine()
     uncoarsen();
     num--;
   }
-  results.push_back(Instances.front());
+  results.emplace_back(Instances.front());
 }
 
 // return the size of instances[]
@@ -304,6 +320,28 @@ void database::chooseBestInstance()
     {
       delete *it;
       Instances.erase(it++);
+    }
+  }
+}
+
+void database::bipartition()
+{
+  for (int i = 0; i < 3; i++)
+  {
+    coarsenInfo.clear();
+    Instances.clear();
+    coarsen(false);
+    initialPartition();
+    uncoarsen();
+    refine();
+  }
+  double bestScore = results.at(0)->getPartitionScore();
+  for (int i = 1; i < results.size(); i++)
+  {
+    if (results.at(i)->getPartitionScore() < bestScore)
+    {
+      bestScore = results.at(i)->getPartitionScore();
+      idx = i;
     }
   }
 }

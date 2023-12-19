@@ -14,6 +14,7 @@
 class Config {
 public:
   int numNodeLeft = 20; // number of node left in the last layer of coarsening
+  bool mix_scheme=true;
   int numInstances =
       20; // number of initial partition done in "initial partition" phase
   double dropRate = 0.3; // drop partition this rate worse than the best
@@ -26,11 +27,8 @@ public:
           // even if the number of node left is larger than "numNodeLeft")
   std::string coarsenScheme =
       "MHEC"; // coarsening scheme when coarsening (HEC/MHEC)
-  std::string coarsenScheme_r =
-      "MHEC"; // coarsening scheme when doing refinement (HEC/MHEC)
   std::string initialParScheme = "FM";
   std::string uncoarsenScheme = "FM";
-  std::string uncoarsenScheme_r = "FM";
 };
 
 struct partition_info {

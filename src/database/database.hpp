@@ -15,15 +15,16 @@ class database
 {
 private:
   Hypergraph *graph;
-  Config config;
   std::list<result *> Instances;
-  std::list<result *> results;
   std::vector<double> spaceLimit;
   std::vector<std::vector<std::pair<int, std::vector<int> *>> *> coarsenInfo;
 
 public:
   database() = default;
 
+  int idx=0;
+  Config config;
+  std::vector<result *> results;
   // int uncoarCnt = 0;
   // multiset<pair<double, pair<int, int>>> sizeOrder;
 
@@ -33,6 +34,7 @@ public:
   // output partitioned graph to the given box
   void outputGraph(parser &the_parser);
 
+  bool check();
   // database coarsening
   // bool for if the coarsening is "restricted"
   void coarsen(bool);
@@ -61,6 +63,7 @@ public:
 
   void chooseBestInstance();
 
+  void bipartition();
   // return sorted node idx in non-decreasing node size order
   std::vector<int> sortNode(Hypergraph *);
 
