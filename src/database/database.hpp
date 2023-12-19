@@ -63,7 +63,9 @@ public:
 
   void chooseBestInstance();
 
-  void bipartition();
+  void bipartition0();
+
+  void bipartition1();
   // return sorted node idx in non-decreasing node size order
   std::vector<int> sortNode(Hypergraph *);
 

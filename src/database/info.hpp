@@ -14,7 +14,6 @@
 class Config {
 public:
   int numNodeLeft = 20; // number of node left in the last layer of coarsening
-  bool mix_scheme=true;
   int numInstances =
       20; // number of initial partition done in "initial partition" phase
   double dropRate = 0.3; // drop partition this rate worse than the best

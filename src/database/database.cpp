@@ -36,22 +36,12 @@ void database::outputGraph(parser &the_parser)
 {
   // result *inst = Instances.front();
   result *inst = results.at(idx);
-  int num0 = 0;
-  int num1 = 0;
   ofstream outputf1("1.txt", ofstream::trunc);
   for (int i = 0; i < graph->getNodeNum(); i++)
   {
     outputf1 << the_parser.reserve_mapping.at(i) << " "
              << inst->getPartitionOf(i) << std::endl;
     // std::cout << i << " " << inst->getPartitionOf(i) << std::endl;
-    if (inst->getPartitionOf(i) == 0)
-    {
-      num0++;
-    }
-    else
-    {
-      num1++;
-    }
   }
   outputf1.close();
   ofstream outputf2("2.txt", ofstream::trunc);
@@ -96,7 +86,7 @@ void database::outputGraph(parser &the_parser)
   }
 
   outputf2.close();
-  std::cout << num0 << " " << num1 << " " << graph->getAllEdges().size() << std::endl;
+  std::cout << inst->getp0size() << " " << inst->getp0size() << " " << graph->getAllEdges().size() << std::endl;
   std::cout << inst->getPartitionScore() << std::endl;
   delete inst;
 }
@@ -324,9 +314,42 @@ void database::chooseBestInstance()
   }
 }
 
-void database::bipartition()
+void database::bipartition0()
 {
-  for (int i = 0; i < 3; i++)
+  double MIN = 999999;
+  std::cout.precision(4);
+  std::vector<std::string> schemes{"EC", "HEC", "MHEC"};
+  for (auto &the_scheme : schemes)
+  {
+    config.coarsenScheme = the_scheme;
+    for (int i = 0; i < 100; i++)
+    {
+      coarsenInfo.clear();
+      Instances.clear();
+      coarsen(false);
+      initialPartition();
+      uncoarsen();
+      refine();
+      MIN = std::min(MIN, results.back()->getPartitionScore());
+      std::cout << MIN << std::endl;
+    }
+  }
+  double bestScore = results.at(0)->getPartitionScore();
+  for (int i = 1; i < results.size(); i++)
+  {
+    if (results.at(i)->getPartitionScore() < bestScore)
+    {
+      bestScore = results.at(i)->getPartitionScore();
+      idx = i;
+    }
+  }
+  std::cout << results.at(idx)->getPartitionScore() << std::endl;
+}
+
+void database::bipartition1()
+{
+
+  for (int i = 0; i < 100; i++)
   {
     coarsenInfo.clear();
     Instances.clear();
