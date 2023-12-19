@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
   if (argc == 1)
   {
-    std::string filename = "../../test/500.txt";
+    std::string filename = "../../test/100.txt";
     parser the_parser;
     the_parser.read(filename);
     // the_parser.write();

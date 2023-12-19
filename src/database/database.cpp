@@ -36,7 +36,8 @@ void database::outputGraph(parser &the_parser)
 {
   // result *inst = Instances.front();
   result *inst = results.at(idx);
-  ofstream outputf1("1.txt", ofstream::trunc);
+  int node_num=graph->getAllEdges().size();
+  ofstream outputf1(to_string(node_num)+"-1.txt", ofstream::trunc);
   for (int i = 0; i < graph->getNodeNum(); i++)
   {
     outputf1 << the_parser.reserve_mapping.at(i) << " "
@@ -44,7 +45,7 @@ void database::outputGraph(parser &the_parser)
     // std::cout << i << " " << inst->getPartitionOf(i) << std::endl;
   }
   outputf1.close();
-  ofstream outputf2("2.txt", ofstream::trunc);
+  ofstream outputf2(to_string(node_num)+"-2.txt", ofstream::trunc);
   for (int i = 0; i < graph->getAllEdges().size(); i++)
   {
     // std::cout<<i;
@@ -86,7 +87,7 @@ void database::outputGraph(parser &the_parser)
   }
 
   outputf2.close();
-  std::cout << inst->getp0size() << " " << inst->getp0size() << " " << graph->getAllEdges().size() << std::endl;
+  //std::cout << inst->getp0size() << " " << inst->getp1size() << " " << graph->getAllEdges().size() << std::endl;
   std::cout << inst->getPartitionScore() << std::endl;
   delete inst;
 }
@@ -331,7 +332,7 @@ void database::bipartition0()
       uncoarsen();
       refine();
       MIN = std::min(MIN, results.back()->getPartitionScore());
-      std::cout << MIN << std::endl;
+      //std::cout << MIN << std::endl;
     }
   }
   double bestScore = results.at(0)->getPartitionScore();
@@ -343,7 +344,7 @@ void database::bipartition0()
       idx = i;
     }
   }
-  std::cout << results.at(idx)->getPartitionScore() << std::endl;
+  //std::cout << results.at(idx)->getPartitionScore() << std::endl;
 }
 
 void database::bipartition1()
