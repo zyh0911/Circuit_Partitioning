@@ -11,10 +11,13 @@
 #include <string>
 #include <vector>
 
-class database {
+class database
+{
 private:
   Hypergraph *graph;
+  Config config;
   std::list<result *> Instances;
+  std::list<result *> results;
   std::vector<double> spaceLimit;
   std::vector<std::vector<std::pair<int, std::vector<int> *>> *> coarsenInfo;
 
@@ -32,22 +35,22 @@ public:
 
   // database coarsening
   // bool for if the coarsening is "restricted"
-  void coarsen(int, bool, std::string, int);
+  void coarsen(bool);
 
   // database initial partitioning
   // int for the number of Instances desired
   // void initialPartition(int, Hypergraph&);
-  void initialPartition(int, std::string);
+  void initialPartition();
 
   // database uncoarsening
   // double stands for 'dropRate'
-  void uncoarsen(double, std::string);
+  void uncoarsen();
 
   // new_partition uncoarsening
   void newUncoarsen();
 
   // database refine
-  void refine(int, double, std::string, std::string, int);
+  void refine();
 
   // return the size of instances[]
   int getInstanceSize();
